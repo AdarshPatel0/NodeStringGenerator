@@ -58,8 +58,9 @@ public class Main {
 			for(int i = 0; i < nodeCount; i++) {
 				lineData = fileScanner.nextLine();
 				Node newNode = new Node(i);
-				nodes[i] = newNode;
-				String nodeIDs[] = lineData.split(",");
+				String nodeID = lineData.substring(0, lineData.indexOf(':'));
+				String nodeIDs[] = lineData.substring(lineData.indexOf(':')+1,lineData.length()).trim().split("\\s*,\\s*");
+				nodes[Integer.parseInt(nodeID)] = newNode;
 				newNode.adjacentNodes = new int[nodeIDs.length];
 				for(int j = 0; j < nodeIDs.length; j++) {
 					newNode.adjacentNodes[j] = Integer.parseInt(nodeIDs[j]);
