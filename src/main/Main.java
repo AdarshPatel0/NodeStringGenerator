@@ -59,10 +59,11 @@ public class Main {
 				lineData = fileScanner.nextLine();
 				Node newNode = new Node(i);
 				String nodeID = lineData.substring(0, lineData.indexOf(':'));
-				String nodeIDs[] = lineData.substring(lineData.indexOf(':')+1,lineData.length()).trim().split("\\s*,\\s*");
+				String nodeIDs[] = lineData.substring(lineData.indexOf(':')+1,lineData.length()).trim().split("[\\s,]+");
 				nodes[Integer.parseInt(nodeID)] = newNode;
 				newNode.adjacentNodes = new int[nodeIDs.length];
 				for(int j = 0; j < nodeIDs.length; j++) {
+					if(!nodeIDs[j].equals(""))
 					newNode.adjacentNodes[j] = Integer.parseInt(nodeIDs[j]);
 				}
 			}
