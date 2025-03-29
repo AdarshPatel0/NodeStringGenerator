@@ -68,9 +68,19 @@ public class Main {
 	}
 	public static void padRecords() {
 		for(int i = 0; i < records.size(); i++) {
-			System.out.println(nodeCount - records.get(i).getLength());
+//			System.out.println(nodeCount - records.get(i).getLength());
 		}
 	}
+	public static void fillOccurences() {
+		for(int i = 0; i < records.size(); i++) {
+			int size = records.get(i).getLength()-1;
+			for(int j = 0; j < records.get(i).getLength(); j++) {
+				Node n = records.get(i).recordData.get(j);
+				n.occurences[size]++;
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
 		File inputFile = new File(JOptionPane.showInputDialog("Input File:"));
 		try {
@@ -81,6 +91,7 @@ public class Main {
 			for (int i = 0; i < nodeCount; i++) {
 				Node newNode = new Node();
 				nodes[i] = newNode;
+				newNode.occurences = new int[nodeCount];
 			}
 			for (int i = 0; i < nodeCount; i++) {
 				lineData = fileScanner.nextLine();
@@ -110,12 +121,20 @@ public class Main {
 			Arrays.fill(checkList, true);
 			parseNode(node, checkList, record);
 		}
-		cullRecords();
+//		cullRecords();
 		sortRecords();
-		padRecords();
+		fillOccurences();
+//		padRecords();
 		for (int i = 0; i < records.size(); i++) {
 //			System.out.println(records.get(i).getLength());
 			newGUI.addList(records.get(i));
+		}
+		for(int i = 0; i < nodeCount; i++) {
+			System.out.print(i + "| ");
+			for(int j = 0; j < nodes.length; j++) {
+				System.out.print(nodes[i].occurences[j] + "\t");
+			}
+			System.out.println();
 		}
 	}
 }

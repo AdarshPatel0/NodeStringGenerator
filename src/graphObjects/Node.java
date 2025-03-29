@@ -3,6 +3,7 @@ package graphObjects;
 public class Node {
 	public int id;
 	public Node adjacentNodes[];
+	public int occurences[];
 	public Node(int i){
 		id = i;
 	}
