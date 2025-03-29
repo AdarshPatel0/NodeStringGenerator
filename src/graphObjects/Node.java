@@ -2,13 +2,19 @@ package graphObjects;
 
 public class Node {
 	public int id;
-	public int adjacentNodes[];
+	public Node adjacentNodes[];
 	public Node(int i){
 		id = i;
 	}
+	public Node() {
+		
+	}
 	public void printAdjacent() {
-		for(int i = 0; i < adjacentNodes.length; i++) {
-			System.out.print(adjacentNodes[i] + " ");
+		if(adjacentNodes.length != 0) {
+			for(int i = 0; i < adjacentNodes.length; i++) {
+				if(adjacentNodes[i]==null) continue;
+				System.out.print(adjacentNodes[i].id + " ");
+			}
 		}
 		System.out.print('\n');
 	}

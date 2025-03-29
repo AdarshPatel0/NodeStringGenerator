@@ -2,6 +2,7 @@ package main;
 
 import javax.swing.*;
 import java.awt.*;
+import graphObjects.Record;
 
 public class GUI extends JFrame{
 	int recordCount = 0;
@@ -19,10 +20,10 @@ public class GUI extends JFrame{
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
-	public void addList(String s) {
+	public void addList(Record r) {
 		recordCount++;
 		recordCounter.setText(Integer.toString(recordCount));
-		list.append(s+"\n");
+		list.append(r.toString()+"\n");
 		setVisible(true);
 	}
 }

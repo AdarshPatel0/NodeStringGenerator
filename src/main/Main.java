@@ -1,6 +1,8 @@
 package main;
 
 import graphObjects.*;
+import graphObjects.Record;
+
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import java.util.Arrays;
@@ -12,78 +14,107 @@ public class Main {
 	public static int nodeCount = 0;
 	public static Node nodes[] = {};
 	public static GUI newGUI = new GUI();
-	public static ArrayList<String> records = new ArrayList<String>();
-	
+	public static ArrayList<Record> records = new ArrayList<Record>();
+
 	public static void sortRecords() {
-		for(int i = 0; i < records.size(); i++) {
+		for (int i = 0; i < records.size() - 1; i++) { // Exclude last element
 			int smallest = i;
-			for(int j = i; j < records.size(); j++) {
-				if(records.get(j).compareTo(records.get(i)) < 0) {
+			for (int j = i + 1; j < records.size(); j++) {
+				if (records.get(j).getLength() > records.get(smallest).getLength()) { // Find smallest
 					smallest = j;
 				}
 			}
-			String temp = records.get(i);
-			records.set(i, records.get(smallest));
-			records.set(smallest, temp);
+			if (smallest != i) {
+				Record temp = records.get(i);
+				records.set(i, records.get(smallest));
+				records.set(smallest, temp);
+			}
 		}
 	}
-	
-	public static void parseNode(int n, boolean checkList[], String record) {
-		record = record + Integer.toString(n);
-		Node nodeObject = nodes[n];
-		checkList[n] = false;
+
+	public static void parseNode(Node n, boolean checkList[], Record record) {
+		record.addNode(n);
+		checkList[n.id] = false;
 		boolean end = true;
-		for(int i = 0; i < nodeObject.adjacentNodes.length; i++) {
-			if(checkList[nodeObject.adjacentNodes[i]]==false) {
-			}else {
+		for (int i = 0; i < n.adjacentNodes.length; i++) {
+			if(n.adjacentNodes[i]==null) continue;
+			if (checkList[n.adjacentNodes[i].id] == false) {
+			} else {
 				end = false;
 				boolean checkListCopy[] = new boolean[checkList.length];
 				System.arraycopy(checkList, 0, checkListCopy, 0, checkListCopy.length);
-				parseNode(nodeObject.adjacentNodes[i],checkListCopy,record);
+				Record recordCopy = record.clone();
+				parseNode(n.adjacentNodes[i], checkListCopy, recordCopy);
 			}
 		}
-		if(end == true) {
+		if (end == true) {
 			records.add(record);
 			return;
 		}
 	}
 	
+	public static void cullRecords() {
+		for(int i = 0; i < records.size(); i++) {
+			String currentString = records.get(i).toString();
+			for(int j = 1; j < currentString.length(); j++) {
+				String removalString = currentString.substring(j);
+				for(int k = 0; k < records.size(); k++) {
+					if(records.get(k).toString().equals(removalString)) {
+						records.remove(k);
+					}
+				}
+			}
+		}
+	}
+	public static void padRecords() {
+		for(int i = 0; i < records.size(); i++) {
+			System.out.println(nodeCount - records.get(i).getLength());
+		}
+	}
 	public static void main(String[] args) {
-		File inputFile = new File(JOptionPane.showInputDialog("Input File:" ));
+		File inputFile = new File(JOptionPane.showInputDialog("Input File:"));
 		try {
 			Scanner fileScanner = new Scanner(inputFile);
 			nodeCount = Integer.parseInt(fileScanner.nextLine());
 			nodes = new Node[nodeCount];
 			String lineData;
-			for(int i = 0; i < nodeCount; i++) {
+			for (int i = 0; i < nodeCount; i++) {
+				Node newNode = new Node();
+				nodes[i] = newNode;
+			}
+			for (int i = 0; i < nodeCount; i++) {
 				lineData = fileScanner.nextLine();
-				Node newNode = new Node(i);
 				String nodeID = lineData.substring(0, lineData.indexOf(':'));
-				String nodeIDs[] = lineData.substring(lineData.indexOf(':')+1,lineData.length()).trim().split("[\\s,]+");
-				nodes[Integer.parseInt(nodeID)] = newNode;
-				newNode.adjacentNodes = new int[nodeIDs.length];
-				for(int j = 0; j < nodeIDs.length; j++) {
-					if(!nodeIDs[j].equals(""))
-					newNode.adjacentNodes[j] = Integer.parseInt(nodeIDs[j]);
+				String adjacentIDs[] = lineData.substring(lineData.indexOf(':') + 1, lineData.length()).trim()
+						.split("[\\s,]+");
+				Node currentNode = nodes[Integer.parseInt(nodeID)];
+				currentNode.id = Integer.parseInt(nodeID);
+				currentNode.adjacentNodes = new Node[adjacentIDs.length];
+				for (int j = 0; j < adjacentIDs.length; j++) {
+					if (!adjacentIDs[j].equals(""))
+						currentNode.adjacentNodes[j] = nodes[Integer.parseInt(adjacentIDs[j])];
 				}
 			}
 			fileScanner.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		for(int i = 0; i < nodes.length; i++) {
+		for (int i = 0; i < nodes.length; i++) {
 			System.out.print(nodes[i].id + "| ");
 			nodes[i].printAdjacent();
 		}
-		for(int i = 0; i < nodes.length; i++) {
-			int node = nodes[i].id;
+		for (int i = 0; i < nodes.length; i++) {
+			Node node = nodes[i];
 			boolean checkList[] = new boolean[nodeCount];
-			String record = "";
+			Record record = new Record();
 			Arrays.fill(checkList, true);
-			parseNode(node,checkList,record);
+			parseNode(node, checkList, record);
 		}
+		cullRecords();
 		sortRecords();
-		for(int i = 0; i < records.size(); i++) {
+		padRecords();
+		for (int i = 0; i < records.size(); i++) {
+//			System.out.println(records.get(i).getLength());
 			newGUI.addList(records.get(i));
 		}
 	}
